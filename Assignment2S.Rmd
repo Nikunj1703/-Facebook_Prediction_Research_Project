@@ -1,0 +1,291 @@
+<html>
+
+<head>
+<title></title>
+<p align="left">Author: <b>Nikunj Ratnaparkhi</b></p>
+<h1 align="center">IT497 OSEMN Assignment</h1>
+<h2 align="center">Can Facebook predict Illinois Governor’s Race</h2>
+<h3><b><u>Introduction</b></u></h3>
+</head>
+
+<body>
+
+<p>The purpose of this paper is to understand and analyze whether Facebook.com –which is the most popular social networking site- can be used to make predictions about Illinois Governor’s Race. Facebook is a social networking site which is loved by millions of people across the globe. Using Facebook, people can share their views and thoughts with each other's. People can create their pages, profiles and discussion forums on the Facebook. So on this platform, popularity of famous personalities can be judged by viewing the number of likes, followers and comments on their pages. </p>
+<p>Using language R, this report predicts the result of election for the Illinois governor’s position by fetching the data from Facebook. Pat Quinn and Bruce Rauner are two candidates who are competing in the election of Nov, 2014 for the position of the governor of Illinois. I have taken data about their followers from their respective Facebook pages to make the predictions about the most probable winner of the election based on the popularity. In this analysis, Rfacebook is the package which is used to apply various functions to get number of likes on photos, videos and comments on Facebook page of each candidate.
+
+</p>
+
+<h3><b><u>Obtaining the data</b></u></h3>
+<p>In this section the process of obtaining the data from Facebook is explained. To obtain data from the facebook, first a person needs to have an account on <a href="http://www.facebook.com">www.facebook.com</a>. Then, we need temporary access token from <a href="https://developers.facebook.com/tools/explorer">https://developers.facebook.com/tools/explorer</a> and this token expires in 2 hours. So, in every 2 hours we need to take new token to carry out our analysis. Below is the token I have taken to carry out the analysis. In the below code "token" is the variable which stores the value of current access token acquired from the facebook.com</p>
+
+
+```{r echo=FALSE}
+token="CAACEdEose0cBANumBTwQiPjsl0EU8f9tFSKUy7qAnHb1G2xEYZAMg5RpsZC3bUOfHvyIchodKAvLAvfgM5PQF0QT14NGCqZCKqQGsOchVbsBPbYf1OiJOM6hwbIjFAQzxOEwKCLUtlXnF4KT0L07djThnmv0P0ZBZCSfCpDJ54Gn34aB4p8vkc7FhP8vAIkxQkU1yqaMrIBHwVCVTgfjS"
+```
+
+<pre>
+
+token="CAACEdEose0cBAJYUZAkIgvRBz2GD4dp03c08zrKBbO2VHZBKmbYDb36UsGLZATLZBDCZB3euZAnG8v8hFtELRCAwadJgzS63QZCM1C
+NrAuNZBuLiZC2ZCiAPdrrZBtdCZAhd8nQJCOArsICiSe5wT7ph9VfmgyF9tz17mZB7UMbhLzsSZAGFZBP7pl627m55IgZBHZChk43VG973BuIZ
+BJQTO8YsN1XB3t"
+</pre>
+
+<p>In the below code chunk, required libraries to carry-out our analysis are given. Rfacebook is a package which provides us a various commands to find number of likes, shares, friends and followers of pages and people available on Facebook. To get use of commands provided by Rfacebook package, libraries httr, rjson and Rfacebook must be available in our code.
+<ol>
+  <li>httr</li>
+  <li>rjson</li>
+  <li>Rfacebook</li>
+</ol></p>
+
+```{r}
+library(httr)
+library(rjson)
+library(Rfacebook)
+
+```
+
+
+<p>In the below code, we are saving all the information like Page Id, status, photos count, likes count, videos count etc. from Pat Quinn's facebook page into the data frame named page_GovernorQuinn. getPage Command brings all the data from the requested facebook page into the data frame.</p>
+<p>I have provided the value of access token in the token variable. "n" determines limit to fetch records from the Facebook page. I have given very large value to "n" so that all the records can get fetched from the facebook page.</p>
+
+<p> Information available on the facebook page of Pat Quinn. The result of below command is the total number of post available on Pat Quinn's facebook page. (100 posts are fetched per request/response cycle)</p>
+
+```{r}
+page_GovernorQuinn <- getPage("GovernorQuinn", token=token, n=10000000000);
+```
+
+
+<p> Information available on the facebook page of Bruce Rauner. The result of below command is the total number of post available on Bruce Rauner's facebook page. (100 posts are fetched per request/response cycle)</p>
+
+```{r}
+page_BruceRauner <- getPage("BruceRauner", token=token, n=10000000000);
+
+```
+
+
+
+<h3><b><u>Data Scrubbing</u></b></h3>
+<p> In this section, scrubbing of data collected from facebook is explained. Data is of no use if it's not clean enough to get/create some useful information. Using below code we will get total number of likes on status, photos and videos on the facebook page of each competitor.</p>
+
+<p>1. Data scrubbing for data gathered from Pat Quinn's Facebook page </p>
+
+<p>In the below code, page_GovernorQuinn$type is the column naming "type" of data frame page_GovernorQuinn which has information about type of post like photo, video, status etc. grep command on page_GovernorQuinn$type column with "photo" provides the list of photos in this column. <br>
+Lastly, sum(photo_GovernorQuinn$likes_count) gives us total number of likes on all the photos of Pat Quinn on his facebook page.</p>
+
+```{r}
+photo_GovernorQuinn=page_GovernorQuinn[grep("photo",page_GovernorQuinn$type),];
+photo_GovernorQuinn_likes=sum(photo_GovernorQuinn$likes_count);
+
+```
+
+
+<p>In the below code, page_GovernorQuinn$type is the column naming "type" of data frame page_GovernorQuinn which has information about type of post like photo, video, status etc. grep command on page_GovernorQuinn$type column with "status" provides the list of status in this column. <br>
+Lastly, sum(status_GovernorQuinn$likes_count) gives us total number of likes on all the status of Pat Quinn on his facebook page.</p>
+
+```{r}
+status_GovernorQuinn=page_GovernorQuinn[grep("status",page_GovernorQuinn$type),];
+status_GovernorQuinn_likes=sum(status_GovernorQuinn$likes_count);
+
+```
+
+
+<p>In the below code, page_GovernorQuinn$type is the column naming "type" of data frame page_GovernorQuinn which has information about type of post like photo, video, status etc. grep command on page_GovernorQuinn$type column with "video" provides the list of video in this column. <br>
+Lastly, sum(video_GovernorQuinn$likes_count) gives us total number of likes on all the video of Pat Quinn on his facebook page.</p>
+
+```{r}
+video_GovernorQuinn=page_GovernorQuinn[grep("video",page_GovernorQuinn$type),];
+video_GovernorQuinn_likes=sum(video_GovernorQuinn$likes_count);
+
+```
+
+
+
+<p>2. Data scrubbing for data gathered from Bruce Rauner's Facebook page </p>
+
+<p>In the below code, page_BruceRauner$type is the column naming "type" of data frame page_BruceRauner which has information about type of post like photo, video, status etc. grep command on page_BruceRauner$type column with "photo" provides the list of photos in this column. <br>
+Lastly, sum(photo_BruceRauner$likes_count) gives us total number of likes on all the photos of Bruce Rauner on his facebook page.</p>
+
+```{r}
+photo_BruceRauner=page_BruceRauner[grep("photo",page_BruceRauner$type),];
+photo_BruceRauner_likes=sum(photo_BruceRauner$likes_count);
+
+```
+
+
+
+<p>In the below code, page_BruceRauner$type is the column naming "type" of data frame page_BruceRauner which has information about type of post like photo, video, status etc. grep command on page_BruceRauner$type column with "status" provides the list of status in this column. <br>
+Lastly, sum(status_BruceRauner$likes_count) gives us total number of likes on all the status of Bruce Rauner on his facebook page.</p>
+
+```{r}
+status_BruceRauner=page_BruceRauner[grep("status",page_BruceRauner$type),];
+status_BruceRauner_likes=sum(status_BruceRauner$likes_count);
+
+```
+
+
+<p>In the below code, page_BruceRauner$type is the column naming "type" of data frame page_BruceRauner which has information about type of post like photo, video, status etc. grep command on page_BruceRauner$type column with "video" provides the list of video in this column. <br>
+Lastly, sum(video_BruceRauner$likes_count) gives us total number of likes on all the video of Bruce Rauner on his facebook page.</p>
+
+```{r}
+video_BruceRauner=page_BruceRauner[grep("video",page_BruceRauner$type),];
+video_BruceRauner_likes=sum(video_BruceRauner$likes_count);
+
+```
+
+
+
+<p>After collecting the data about the number of likes on status, photos and videos of each candidate, a data frame to store the final results(numbers) is created. The data frame is stored in the variable naming final.df. Below is the code to create data frame.<br>
+In variable "Name", Pat Quinn and Bruce Rauner is saved. In the variable Photo_likes, number of likes on photos of Pat Quinn and Bruce Rauner is saved. In the variable Video_likes, number of likes on videos of Pat Quinn and Bruce Rauner is saved. In the variable Status_likes, number of likes on status of Pat Quinn and Bruce Rauner is saved.</p>
+
+```{r echo=FALSE}
+final.df=data.frame(Name=c("Pat Quinn","Bruce Rauner"),Photo_likes=c(photo_GovernorQuinn_likes,photo_BruceRauner_likes),Video_likes=c(video_GovernorQuinn_likes, video_BruceRauner_likes), Status_likes=c(status_GovernorQuinn_likes,status_BruceRauner_likes))
+```
+
+<pre>
+final.df=data.frame(Name=c("Pat Quinn","Bruce Rauner"),Photo_likes=c(photo_Go
+vernorQuinn_likes,photo_BruceRauner_likes),Video_likes=c(video_GovernorQuinn_lik
+es, video_BruceRauner_likes), Status_likes=c(status_GovernorQuinn_likes,status_B
+ruceRauner_likes))
+</pre>
+
+
+<p>Below is the data frame holding final numbers about popularity of Pat Quinn and Bruce Rauner. That means, this data frame holds the data about number of likes on photos, status and videos on facebook page of Pat Quinn and Bruce Rauner.</p>
+
+```{r}
+final.df
+```
+<p><i>Table 1 shows the cleaned data collected from the data sources.</i></p>
+
+
+<h3><b><u>Data Section</u></b></h3>
+
+<p>1. Datatype of final.df</p>
+```{r}
+class(final.df)
+```
+<p>2. Datatype of page_GovernorQuinn</p>
+```{r}
+class(page_GovernorQuinn)
+```
+<p>3. Datatype of page_BruceRauner</p>
+```{r}
+class(page_BruceRauner)
+```
+<p>4. Datatype of photo_BruceRauner</p>
+```{r}
+class(photo_BruceRauner)
+```
+<p>5. Datatype of photo_GovernorQuinn</p>
+```{r}
+class(photo_GovernorQuinn)
+```
+<p>6. Datatype of photo_BruceRauner_likes</p>
+```{r}
+class(photo_BruceRauner_likes)
+```
+<p>7. Datatype of photo_GovernorQuinn_likes</p>
+```{r}
+class(photo_GovernorQuinn_likes)
+```
+<p>8. Datatype of status_BruceRauner</p>
+```{r}
+class(status_BruceRauner)
+```
+<p>9. Datatype of status_GovernorQuinn</p>
+```{r}
+class(status_GovernorQuinn)
+```
+<p>10. Datatype of status_BruceRauner_likes</p>
+```{r}
+class(status_BruceRauner_likes)
+```
+<p>11. Datatype of status_GovernorQuinn_likes</p>
+```{r}
+class(status_GovernorQuinn_likes)
+```
+<p>12. Datatype of video_BruceRauner</p>
+```{r}
+class(video_BruceRauner)
+```
+<p>13. Datatype of video_GovernorQuinn</p>
+```{r}
+class(video_GovernorQuinn)
+```
+<p>14. Str of final.df</p>
+```{r}
+str(final.df)
+```
+<p>15. Summary of final.df</p>
+```{r}
+summary(final.df)
+```
+
+<h3><b><u>Result Section</u></b></h3>
+
+<p>Below is the final/cleaned data table showing number of likes on status, photos and videos of Pat Quinn and Bruce Rauner</p>
+
+```{r}
+final.df
+```
+<p><i>Table 1 shows the cleaned data collected from the data sources.</i></p>
+
+<p>From the above table, we can analyze that the number of likes on photos, videos and status of Bruce Rauner's facebook page is greater than that of Pat Quinn's (Governer Quinn). Moreover, we can make our prediction that Bruce Rauner is more likely to win the election than Pat Quinn. </p>
+
+
+<p>Below is the graphical analysis showing the popularity of Pat Quinn and Bruce Rauner</p>
+
+
+
+
+
+<p>1. Graph to represent number of likes on Photos of each candidate's facebook page.</p>
+<p>ggplot2 is a graph plotting system in R. This package provides us various functionalities to create graphs through which we can showcase our analysis in more presentable form.</p>
+<p>Using the below code, Name is presented on the X-axis and number of likes on the photos of Pat Quinn and Bruce Rauner are presented on Y-axis. geom_bar provides us a functionality to create bar graph. Through, scale_fill_manual we can fill blue and green color in our bars. Moreover, using ggtitle we can provide title to our graph.</p>
+```{r fig.width=10, fig.height=6}
+library(ggplot2)
+ggplot(data=final.df, aes(x=Name, y=Photo_likes, fill=Name)) + geom_bar(stat="identity") + scale_fill_manual(values=c("blue", "green")) + ggtitle("Number of likes on Photos of each candidate")
+```
+<p><i>Fig. 1 compares the number of likes on photos of each candidate.</i></p>
+
+<p>Above graph provides graphical representation of number of likes received on the photos of Bruce Rauner's and Pat Quinn's facebook page. Based on the analysis, we can conclude that number of likes for Bruce Rauner is nearly 2.5 times higher than that of Pat Quinn.</p>
+
+
+<p>2. Graph to represent number of likes on Videos of each candidate's facebook page</p>
+<p>Using the below code, Name is presented on the X-axis and number of likes on the video of Pat Quinn and Bruce Rauner are presented on Y-axis. geom_bar provides us a functionality to create bar graph. Through, scale_fill_manual we can fill blue and green color in our bars. Moreover, using ggtitle we can provide title to our graph.</p>
+```{r fig.width=10, fig.height=6}
+ggplot(data=final.df, aes(x=Name, y=Video_likes, fill=Name)) + geom_bar(stat="identity") + scale_fill_manual(values=c("blue", "green")) + ggtitle("Number of likes on Videos of each candidate")
+```
+<p><i>Fig. 2 compares the number of likes on videos of each candidate.</i></p>
+
+
+<p>Above graph provides graphical representation of number of likes received on the videos of Bruce Rauner's and Pat Quinn's facebook page. Based on the analysis, we can conclude that number of likes for Bruce Rauner is nearly 12 times higher than that of Pat Quinn.</p>
+
+<p>1. Graph to represent number of likes on Status of each candidate's facebook page</p>
+<p>Using the below code, Name is presented on the X-axis and number of likes on the status of Pat Quinn and Bruce Rauner are presented on Y-axis. geom_bar provides us a functionality to create bar graph. Through, scale_fill_manual we can fill blue and green color in our bars. Moreover, using ggtitle we can provide title to our graph.</p>
+
+```{r fig.width=10, fig.height=6}
+ggplot(data=final.df, aes(x=Name, y=Status_likes, fill=Name)) + geom_bar(stat="identity") + scale_fill_manual(values=c("blue", "green")) + ggtitle("Number of likes on Status of each candidate")
+```
+<p><i>Fig. 3 compares the number of likes on status of each candidate.</i></p>
+
+<p>Above graph provides graphical representation of number of likes received on the status of Bruce Rauner's and Pat Quinn's facebook page. Based on the analysis, we can conclude that number of likes for Bruce Rauner is nearly 3 times higher than that of Pat Quinn.</p>
+
+<h3><b><u>Conclusion:</u></b></h3>
+
+<p>Graphical Representation of final prediction:</p>
+<p>In the below code, Name is presented on the X-axis and total number of likes on the photos, videos and status of Pat Quinn and Bruce Rauner are presented on Y-axis. geom_bar provides us a functionality to create bar graph. Through, scale_fill_manual we can fill blue and green color in our bars. Moreover, using ggtitle we can provide title to our graph.</p>
+```{r fig.width=10, fig.height=6}
+ggplot(data=final.df, aes(x=Name, y=(Photo_likes+Video_likes+Status_likes), fill=Name)) + geom_bar(stat="identity") + scale_fill_manual(values=c("blue", "green")) + ggtitle("Final Result of Analysis")
+```
+<p><i>Fig. 4 shows the final result of predictive analysis about winner of Illinois Governor's Race.</i></p>
+
+<p>The approach explained in this report provides a way to make use of facebook to find the popularity of each candidate standing in the election for Illinois Governor position. We can also understand the fact that how likes on photos, videos and status posted by each candidate can help us in connecting the dots between their popularity and chance of winning the election. Moreover, the tabular and graphical analysis using ggplot2 package we can understand the results more thoroughly and substantially.</p>
+
+
+<br>
+<p>Source:</p>
+<p>1. http://pablobarbera.com/blog/archives/3.html</p>
+<p>2. http://cran.r-project.org/web/packages/Rfacebook/Rfacebook.pdf</p>
+
+</body>
+</html>
