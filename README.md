@@ -1,4 +1,4 @@
-Assignment-2_IT497
+Facebook Prediction Research Project
 ==================
 
 Can Facebook predict Illinois Governor’s Race
